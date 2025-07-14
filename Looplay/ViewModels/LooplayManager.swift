@@ -22,6 +22,8 @@ struct LooplayManager<Item: Equatable> {
 
     /// Has every item been picked already?
     var isEmpty: Bool { queue.isEmpty }
+    
+    var peek: Item? { queue.first }
 
     /// Initialize with a list of items; shuffles immediately.
     init(items: [Item]) {

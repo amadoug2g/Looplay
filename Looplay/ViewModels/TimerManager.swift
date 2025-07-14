@@ -12,6 +12,12 @@ import Combine
 final class TimerManager: ObservableObject {
     @Published private(set) var elapsedTime: TimeInterval = 0
     @Published private(set) var isRunning: Bool = false
+    
+    var remainingTime: TimeInterval { totalDuration - elapsedTime }
+    
+    var isInFinalSeconds: Bool {
+        remainingTime <= 5
+    }
 
     /// Total duration for the timer
     private(set) var totalDuration: TimeInterval
