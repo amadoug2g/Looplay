@@ -9,17 +9,17 @@ import Foundation
 import SwiftData
 
 @Model
-class Song: Identifiable, Equatable {
-    var id: UUID
+class Song {
     var title: String
     var artist: String
-    var createdDate: Date
+    var createdDate: Date = Date.now
+    var mastery: Int = 0
 
-    init(id: UUID = UUID(), title: String, artist: String, createdDate: Date = Date()) {
-        self.id = id
+
+    init(title: String, artist: String, mastery: Int = 0) {
         self.title = title
         self.artist = artist
-        self.createdDate = createdDate
+        self.mastery = mastery
     }
 }
 

@@ -8,9 +8,9 @@
 extension Song {
     static var sampleSongs: [Song] {
         [
-            Song(title: "Fur Elise", artist: "Beethoven"),
-            Song(title: "Clair de Lune", artist: "Debussy"),
-            Song(title: "Prelude in C#", artist: "Rachmaninoff")
+            Song(title: "Fur Elise", artist: "Beethoven", mastery: 3),
+            Song(title: "Clair de Lune", artist: "Debussy", mastery: 0),
+            Song(title: "Prelude in C#", artist: "Rachmaninoff", mastery: 4)
         ]
     }
 }

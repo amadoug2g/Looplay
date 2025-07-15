@@ -27,6 +27,8 @@ struct SongListView: View {
                             .font(.headline)
                         Text(song.artist)
                             .font(.subheadline)
+                        RatingView(rating: .constant(song.mastery))
+                                    .allowsHitTesting(false)
                     }
                     .padding(.vertical, 4)
                 }
@@ -176,3 +178,10 @@ struct SongListView: View {
     }
 }
 
+#Preview {
+    let preview = Preview()
+    preview.addExample(Song.sampleSongs)
+    
+    return SongListView()
+        .modelContainer(preview.container)
+}

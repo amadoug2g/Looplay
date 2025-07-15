@@ -14,14 +14,19 @@ struct NewSongView: View {
     
     @State private var title = ""
     @State private var artist = ""
+    @State private var mastery = 0
 
     var body: some View {
         NavigationStack {
             Form {
                 TextField("Song Title", text: $title)
                 TextField("Artist", text: $artist)
+                HStack {
+                    Text("Song Mastery: ")
+                    RatingView(rating: $mastery)
+                }
                 Button("Create") {
-                    let newSong = Song(title: title, artist: artist)
+                    let newSong = Song(title: title, artist: artist, mastery: mastery)
                     context.insert(newSong)
                     dismiss()
                 }
