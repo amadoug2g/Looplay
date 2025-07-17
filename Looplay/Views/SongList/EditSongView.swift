@@ -31,21 +31,21 @@ struct EditSongView: View {
             }
             
             Section("Mastery") {
-                RatingView(rating: $mastery)
+                RatingView(rating: $mastery, showHint: true)
             }
         }
         .navigationTitle("Edit Song")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if changed {
-                Button("Update") {
-                    song.title   = title
-                    song.artist  = artist
-                    song.mastery = mastery
-                    dismiss()
-                }
-                .buttonStyle(.borderedProminent)
+            Button("Update") {
+                song.title   = title
+                song.artist  = artist
+                song.mastery = mastery
+                dismiss()
             }
+            .buttonStyle(.borderedProminent)
+            .disabled(!changed)
+
         }
         .onAppear {
             title = song.title

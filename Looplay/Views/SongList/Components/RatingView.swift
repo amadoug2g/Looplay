@@ -9,6 +9,8 @@ import SwiftUI
 
 struct RatingView: View {
     @Binding var rating: Int
+    var showHint = false
+    
     var label = ""
     var maxRating = 5
     
@@ -38,7 +40,7 @@ struct RatingView: View {
             }
         }.buttonStyle(.plain)
         
-        if rating == 1 {
+        if showHint && rating == 1 {
             Text("Tap the first star again to reset to 0")
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -54,7 +56,3 @@ struct RatingView: View {
         }
     }
 }
-
-//#Preview {
-    //RatingView(rating: .constant(4))
-//}
