@@ -11,7 +11,7 @@ import SwiftData
 @main
 struct LooplayApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([ Song.self ])
+        let schema = Schema([ Song.self, SongsList.self ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
         do {

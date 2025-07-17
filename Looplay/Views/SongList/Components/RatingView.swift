@@ -26,13 +26,24 @@ struct RatingView: View {
             
             ForEach(1...maxRating, id: \.self) { number in
                 Button {
-                    rating = number
+                    if rating == 1 && number == 1 {
+                        rating = 0
+                    } else {
+                        rating = number
+                    }
                 } label: {
                     image(for: number)
                         .foregroundStyle(number > rating ? offColor : onColor)
                 }
             }
         }.buttonStyle(.plain)
+        
+        if rating == 1 {
+            Text("Tap the first star again to reset to 0")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+
     }
     
     func image(for number: Int) -> Image {
@@ -44,6 +55,6 @@ struct RatingView: View {
     }
 }
 
-#Preview {
-    RatingView(rating: .constant(4))
-}
+//#Preview {
+    //RatingView(rating: .constant(4))
+//}

@@ -6,27 +6,49 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
-    enum Tabs {
-        case songs, looplay
-    }
+    @State private var createNewSong : Bool = false
     
-    @State private var selection: Tabs = .songs
+    @Query(filter: #Predicate { $0.mastery == 0 }, sort: \Song.title)
+    private var songsToLearn: [Song]
+
+    @Query(filter: #Predicate { $0.mastery >= 1 }, sort: \Song.title)
+    private var repertoireSongs: [Song]
+    
     var body: some View {
-        TabView(selection: $selection) {
-            Tab("Songs", systemImage: "music.note.list", value: .songs) {
-                SongListView()
+        NavigationStack {
+            List {
+                Section(header: Text("Lists")) {
+                    SongNavigationLink(list: repertoireSongs, title: "Repertoire")
+                    SongNavigationLink(list: songsToLearn, title: "Learning queue")
+                }
             }
-            Tab("Looplay", systemImage: "shuffle", value: .looplay) {
-                LooplayView()
+            .toolbar {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button {
+                        createNewSong = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                            Text("New Song")
+                        }
+                        .font(.headline)
+                    }
+                    Spacer()
+                    
+                    /*
+
+                    Button("Add List") {
+                        print("Pressed")
+                    }
+                    */
+                }
+            }
+            .sheet(isPresented: $createNewSong) {
+                NewSongView().presentationDetents([.medium])
             }
         }
     }
 }
-
-
-#Preview {
-    ContentView()
-}
-

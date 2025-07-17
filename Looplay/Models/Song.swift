@@ -15,11 +15,15 @@ class Song {
     var createdDate: Date = Date.now
     var mastery: Int = 0
 
+    @Relationship(inverse: \SongsList.songs)
+    var lists: SongsList?
 
-    init(title: String, artist: String, mastery: Int = 0) {
+
+    init(title: String, artist: String, mastery: Int = 0, list: SongsList? = nil) {
         self.title = title
         self.artist = artist
         self.mastery = mastery
+        self.lists = list
     }
 }
 

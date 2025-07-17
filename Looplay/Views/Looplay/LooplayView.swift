@@ -9,8 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct LooplayView: View {
-    // MARK: – Data
-    @Query(sort: \Song.createdDate) private var songs: [Song]
+    let songs: [Song]
     
     // MARK: – Random-picker state
     @State private var queue = LooplayManager<Song>(items: [])
@@ -103,8 +102,4 @@ struct LooplayView: View {
         currentSong = nil
         queue = LooplayManager(items: songs)
     }
-}
-
-#Preview {
-    LooplayView()
 }

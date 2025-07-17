@@ -7,86 +7,88 @@
 
 import SwiftUI
 import SwiftData
-import UIKit   // for UIPasteboard
+import UIKit
 
 struct SongListView: View {
     @Environment(\.modelContext) private var context
-    @State private var createNewSong = false
-    @State private var showCopyAlert = false
-    @State private var showImportResult = false
-    @State private var importResultMessage = ""
-    @State private var showDeleteAllConfirmation = false
-    @Query(sort: \Song.title) private var songs: [Song]
+    @State private var createNewSong : Bool = false
+    @State private var showCopyAlert : Bool = false
+    @State private var showImportResult : Bool = false
+    @State private var importResultMessage : String = ""
+    @State private var activeAlert: AlertType?
+    
+    let title: String
+    let songs: [Song]
 
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(songs) { song in
-                    VStack(alignment: .leading) {
-                        Text(song.title)
+            VStack {
+                SongsView(songs: songs)
+                .listStyle(.plain)
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button {
+                            createNewSong = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                Text("New Song")
+                            }
                             .font(.headline)
-                        Text(song.artist)
-                            .font(.subheadline)
-                        RatingView(rating: .constant(song.mastery))
-                                    .allowsHitTesting(false)
-                    }
-                    .padding(.vertical, 4)
-                }
-                .onDelete(perform: deleteSongs)
-            }
-            .listStyle(.plain)
-            .navigationTitle("Songs")
-            .toolbar {
-                // Add button
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        createNewSong = true
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .imageScale(.large)
-                    }
-                }
-                
-                // Ellipsis menu
-                ToolbarItem(placement: .primaryAction) {
-                    Menu {
-                        Button("Import from Clipboard", action: importSongsFromClipboard)
-                        Button("Export to Clipboard", action: exportSongsToClipboard)
-                        Divider()
-                        Button("Delete All Songs", role: .destructive) {
-                            showDeleteAllConfirmation = true
                         }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                            .imageScale(.large)
+                        
+                        Spacer()
+                    }
+                    /*
+                    ToolbarItem(placement: .primaryAction) {
+                        Button { createNewSong = true } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .imageScale(.large)
+                        }
+                    }
+                    */
+                    ToolbarItem(placement: .primaryAction) {
+                        Menu {
+                            Button { activeAlert = .importSongs("?") } label: { Text("Import from Clipboard") }
+                            Button { activeAlert = .copySongs } label: { Text("Export to Clipboard") }
+                            Divider()
+                            Button("Delete All Songs", role: .destructive) { activeAlert = .deleteAll }
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .imageScale(.large)
+                        }
                     }
                 }
-            }
-            .sheet(isPresented: $createNewSong) {
-                NewSongView().presentationDetents([.medium])
-            }
-            .alert("Copied!", isPresented: $showCopyAlert) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("Copied \(songs.count) songs to clipboard.")
-            }
-            .alert(importResultMessage, isPresented: $showImportResult) {
-                Button("OK", role: .cancel) {}
-            }
-            // Delete-all confirmation
-            .alert("Delete All Songs?", isPresented: $showDeleteAllConfirmation) {
-                Button("Cancel", role: .cancel) {}
-                Button("Delete All", role: .destructive, action: deleteAllSongs)
-            } message: {
-                Text("This will permanently remove all \(songs.count) songs from your library.")
-            }
-        }
-    }
-
-    private func deleteSongs(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                context.delete(songs[index])
+                .sheet(isPresented: $createNewSong) {
+                    NewSongView().presentationDetents([.medium])
+                }
+                .alert(item: $activeAlert) { alert in
+                    switch alert {
+                    case .importSongs(let placeholder):
+                        return Alert(
+                            title: Text("Import Result!"),
+                            message: Text(placeholder),
+                            dismissButton: .default(Text("OK"))
+                        )
+                        
+                    case .copySongs:
+                        return Alert(
+                            title: Text("Copied!"),
+                            message: Text("Copied \(songs.count) songs to clipboard."),
+                            dismissButton: .default(Text("OK"))
+                        )
+                        
+                    case .deleteAll:
+                        return Alert(
+                            title: Text("Delete All Songs?!"),
+                            message: Text("This will permanently remove all songs \(songs.count) songs from your library."),
+                            primaryButton: .destructive(Text("Delete All"), action: deleteAllSongs),
+                            secondaryButton: .cancel()
+                        )
+                    }
+                }
             }
         }
     }
@@ -101,7 +103,6 @@ struct SongListView: View {
     }
     
     private func exportSongsToClipboard() {
-        // 1) Build a numbered, newline-separated string of "#X Title – Artist"
         let exportText = songs
             .enumerated()
             .map { index, song in
@@ -109,12 +110,11 @@ struct SongListView: View {
             }
             .joined(separator: "\n")
 
-        // 2) Copy to clipboard
         UIPasteboard.general.string = exportText
 
-        // 3) Show confirmation
         showCopyAlert = true
     }
+    
     private func importSongsFromClipboard() {
         guard let clipboard = UIPasteboard.general.string,
               !clipboard.isEmpty else {
@@ -176,12 +176,4 @@ struct SongListView: View {
         importResultMessage = "Imported \(imported) song(s). Skipped \(skipped) duplicates."
         showImportResult = true
     }
-}
-
-#Preview {
-    let preview = Preview()
-    preview.addExample(Song.sampleSongs)
-    
-    return SongListView()
-        .modelContainer(preview.container)
 }
