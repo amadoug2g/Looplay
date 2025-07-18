@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DefaultListRow: View {
+struct ListRow: View {
     let title: String
     let songCount: String
     
