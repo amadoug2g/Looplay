@@ -10,6 +10,7 @@ import SwiftUI
 struct SongsView: View {
     @Environment(\.modelContext) private var context
     let songs: [Song]
+    let title: String
     
     var body: some View {
             NavigationStack {
@@ -34,13 +35,21 @@ struct SongsView: View {
                             NavigationLink {
                                 EditSongView(song: song)
                             } label: {
-                                SongRow(song: song)
+                                VStack(alignment: .leading) {
+                                    Text(song.title)
+                                        .font(.headline)
+                                    Text(song.artist)
+                                        .font(.subheadline)
+                                    RatingView(rating: .constant(song.mastery))
+                                                .allowsHitTesting(false)
+                                }
+                                .padding(.vertical, 4)
                             }
                         }
                         .onDelete(perform: deleteSongs)
                     }
                 }
-                .navigationTitle("Repertoire")
+                .navigationTitle(title)
             }
         }
     

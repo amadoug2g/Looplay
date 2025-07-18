@@ -23,7 +23,7 @@ struct SongListView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                SongsView(songs: songs)
+                SongsView(songs: songs, title: title)
                 .listStyle(.plain)
                 .navigationTitle(title)
                 .navigationBarTitleDisplayMode(.inline)
@@ -40,15 +40,7 @@ struct SongListView: View {
                         }
                         
                         Spacer()
-                    }
-                    /*
-                    ToolbarItem(placement: .primaryAction) {
-                        Button { createNewSong = true } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .imageScale(.large)
-                        }
-                    }
-                    */
+                    } 
                     ToolbarItem(placement: .primaryAction) {
                         Menu {
                             Button { activeAlert = .importSongs("?") } label: { Text("Import from Clipboard") }

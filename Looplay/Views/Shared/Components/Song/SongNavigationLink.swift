@@ -15,7 +15,13 @@ struct SongNavigationLink: View {
         NavigationLink {
             SongListView(title: title, songs: list)
         } label: {
-            DefaultListRow(title: title, songCount: list.count.description)
+            HStack {
+                Text(title)
+                Spacer()
+                Text(list.count.description)
+                    .font(.subheadline)
+            }
+            .padding(.vertical, 4)
         }
     }
 }

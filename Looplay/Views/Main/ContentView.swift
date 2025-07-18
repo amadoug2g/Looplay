@@ -9,20 +9,30 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @State private var createNewSong : Bool = false
-    
+    @State private var createNewSong = false
+    @State private var createNewList = false
+
     @Query(filter: #Predicate { $0.mastery == 0 }, sort: \Song.title)
     private var songsToLearn: [Song]
 
     @Query(filter: #Predicate { $0.mastery >= 1 }, sort: \Song.title)
     private var repertoireSongs: [Song]
-    
+
+    @Query(sort: \SongsList.name)
+    private var songLists: [SongsList]
+
     var body: some View {
         NavigationStack {
             List {
-                Section(header: Text("Lists")) {
+                Section {
                     SongNavigationLink(list: repertoireSongs, title: "Repertoire")
                     SongNavigationLink(list: songsToLearn, title: "Learning queue")
+                }
+
+                Section(header: Text("My Lists")) {
+                    ForEach(songLists) { list in
+                        SongsListNavigationLink(list: list)
+                    }
                 }
             }
             .toolbar {
@@ -36,18 +46,22 @@ struct ContentView: View {
                         }
                         .font(.headline)
                     }
-                    Spacer()
                     
-                    /*
+                    Spacer()
 
-                    Button("Add List") {
-                        print("Pressed")
+                    Button {
+                        createNewList = true
+                    } label: {
+                        Text("New List")
+                            .foregroundColor(.blue)
                     }
-                    */
                 }
             }
             .sheet(isPresented: $createNewSong) {
-                NewSongView().presentationDetents([.medium])
+                NewSongView().presentationDetents([.large])
+            }
+            .sheet(isPresented: $createNewList) {
+                NewSongListView().presentationDetents([.large])
             }
         }
     }
