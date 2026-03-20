@@ -21,6 +21,8 @@ struct ContentView: View {
     @Query(sort: \SongsList.name)
     private var songLists: [SongsList]
 
+    private var allSongs: [Song] { repertoireSongs + songsToLearn }
+
     var body: some View {
         NavigationStack {
             List {
@@ -30,8 +32,30 @@ struct ContentView: View {
                 }
 
                 Section(header: Text("My Lists")) {
-                    ForEach(songLists) { list in
-                        SongsListNavigationLink(list: list)
+                    if songLists.isEmpty {
+                        Text("No lists yet. Tap "New List" to create one.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    } else {
+                        ForEach(songLists) { list in
+                            SongsListNavigationLink(list: list)
+                        }
+                    }
+                }
+            }
+            .overlay {
+                if allSongs.isEmpty && songLists.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "music.note")
+                            .font(.system(size: 60))
+                            .foregroundColor(.secondary)
+                        Text("Your library is empty")
+                            .font(.title2.bold())
+                        Text("Tap "New Song" below to start building your practice library.")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
                     }
                 }
             }

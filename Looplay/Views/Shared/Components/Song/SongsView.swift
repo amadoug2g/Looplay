@@ -11,55 +11,76 @@ struct SongsView: View {
     @Environment(\.modelContext) private var context
     let songs: [Song]
     let title: String
-    
-    var body: some View {
-            NavigationStack {
-                VStack(spacing: 16) {
-                    NavigationLink {
-                        LooplayView(songs: songs)
-                    } label: {
-                        Label("Shuffle", systemImage: "shuffle")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12).fill(Color.blue)
-                            )
-                            .foregroundStyle(.white)
-                            .padding(.horizontal)
-                    }
-                    .buttonStyle(.plain)
 
-                    List {
-                        ForEach(songs) { song in
-                            NavigationLink {
-                                EditSongView(song: song)
-                            } label: {
-                                VStack(alignment: .leading) {
-                                    Text(song.title)
-                                        .font(.headline)
-                                    Text(song.artist)
-                                        .font(.subheadline)
-                                    RatingView(rating: .constant(song.mastery))
-                                                .allowsHitTesting(false)
-                                }
-                                .padding(.vertical, 4)
-                            }
-                        }
-                        .onDelete(perform: deleteSongs)
-                    }
+    var body: some View {
+        VStack(spacing: 16) {
+            if songs.isEmpty {
+                Spacer()
+                VStack(spacing: 12) {
+                    Image(systemName: "music.note.list")
+                        .font(.system(size: 48))
+                        .foregroundColor(.secondary)
+                    Text("No songs yet")
+                        .font(.headline)
+                    Text("Tap \u{201C}New Song\u{201D} to add your first track.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                 }
-                .navigationTitle(title)
+                Spacer()
+            } else {
+                NavigationLink {
+                    LooplayView(songs: songs)
+                } label: {
+                    Label("Shuffle", systemImage: "shuffle")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12).fill(Color.blue)
+                        )
+                        .foregroundStyle(.white)
+                        .padding(.horizontal)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Shuffle \(songs.count) songs")
+                .accessibilityHint("Starts a randomized practice session")
+
+                List {
+                    ForEach(songs) { song in
+                        NavigationLink {
+                            EditSongView(song: song)
+                        } label: {
+                            VStack(alignment: .leading) {
+                                Text(song.title)
+                                    .font(.headline)
+                                Text(song.artist)
+                                    .font(.subheadline)
+                                RatingView(rating: .constant(song.mastery))
+                                    .allowsHitTesting(false)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                        .accessibilityLabel("\(song.title) by \(song.artist), mastery \(song.mastery) out of 5")
+                    }
+                    .onDelete(perform: deleteSongs)
+                }
             }
         }
-    
+        .navigationTitle(title)
+    }
+
     private func deleteSongs(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                let song = songs[index]
-                context.delete(song)
+                context.delete(songs[index])
             }
-            try? context.save()
+            do {
+                try context.save()
+            } catch {
+                print("SongsView: failed to save after delete – \(error)")
+            }
         }
     }
 }

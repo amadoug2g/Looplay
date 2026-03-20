@@ -13,7 +13,7 @@ struct Preview {
     init() {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         do {
-            container = try ModelContainer(for: Song.self, configurations: config)
+            container = try ModelContainer(for: Song.self, SongsList.self, configurations: config)
         } catch {
             fatalError("Could not create preview container")
         }

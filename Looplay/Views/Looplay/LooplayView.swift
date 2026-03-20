@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct LooplayView: View {
     let songs: [Song]
@@ -25,62 +26,61 @@ struct LooplayView: View {
     @State private var showDurationPicker = false
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                
-                // Remaining / Total
-                HStack {
-                    Text("Remaining: \(queue.remainingCount)")
-                    Spacer()
-                    Text("Total: \(queue.totalCount)")
-                }
-                .padding(.horizontal)
-                
-                // Current song display
-                SongInfoView(currentSong: $currentSong)
-                
-                VStack {
-                    Text("Next:")
-                    Text(queue.peek?.title ?? "")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .padding(.bottom, 20)
-                        .frame(height: 20)
-                }.opacity(timerManager.isInFinalSeconds ? 1 : 0)
-                
-                TimerRingView(timerManager: timerManager)
-                
-                PlaybackControlsView(
-                    currentSong: $currentSong,
-                    queue: $queue,
-                    timerManager: timerManager,
-                    songs: songs
-                )
-                
-                Spacer(minLength: 20)
-                
-                // Duration picker row
-                DurationPickerButton(
-                    selectedDuration: $selectedDuration,
-                    showPicker: $showDurationPicker
-                )
+        VStack(spacing: 20) {
+
+            // Remaining / Total
+            HStack {
+                Text("Remaining: \(queue.remainingCount)")
+                Spacer()
+                Text("Total: \(queue.totalCount)")
             }
-            .navigationTitle("Looplay")
-            .navigationBarTitleDisplayMode(.large)
-            .onChange(of: selectedDuration) { _, newValue in
-                timerManager.reset(to: TimeInterval(newValue.rawValue))
+            .padding(.horizontal)
+
+            // Current song display
+            SongInfoView(currentSong: $currentSong)
+
+            VStack {
+                Text("Next:")
+                Text(queue.peek?.title ?? "")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .padding(.bottom, 20)
+                    .frame(height: 20)
             }
-            .sheet(isPresented: $showDurationPicker) {
-                DurationPickerView(
-                    options: PracticeDuration.allCases,
-                    selected: $selectedDuration
-                )
-            }
+            .opacity(timerManager.isInFinalSeconds ? 1 : 0)
+
+            TimerRingView(timerManager: timerManager)
+
+            PlaybackControlsView(
+                currentSong: $currentSong,
+                queue: $queue,
+                timerManager: timerManager,
+                songs: songs
+            )
+
+            Spacer(minLength: 20)
+
+            // Duration picker row
+            DurationPickerButton(
+                selectedDuration: $selectedDuration,
+                showPicker: $showDurationPicker
+            )
+        }
+        .navigationTitle("Looplay")
+        .navigationBarTitleDisplayMode(.large)
+        .onChange(of: selectedDuration) { _, newValue in
+            timerManager.reset(to: TimeInterval(newValue.rawValue))
+        }
+        .sheet(isPresented: $showDurationPicker) {
+            DurationPickerView(
+                options: PracticeDuration.allCases,
+                selected: $selectedDuration
+            )
         }
         .onAppear {
-          timerManager.onComplete = {
-            advanceOrFinish()
-          }
+            timerManager.onComplete = {
+                advanceOrFinish()
+            }
         }
     }
     
@@ -88,7 +88,7 @@ struct LooplayView: View {
     private func advanceOrFinish() {
         if let nextSong = queue.next() {
             currentSong = nextSong
-
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             timerManager.stop()
             timerManager.start()
         } else {
@@ -98,6 +98,7 @@ struct LooplayView: View {
 
     /// Completely reset everything to the idle state.
     private func endSession() {
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
         timerManager.stop()
         currentSong = nil
         queue = LooplayManager(items: songs)

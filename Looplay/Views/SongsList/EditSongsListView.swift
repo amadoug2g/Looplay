@@ -63,6 +63,10 @@ struct EditSongsListView: View {
 
     private func save() {
         songsList.songs = Array(selectedSongs)
-        try? context.save()
+        do {
+            try context.save()
+        } catch {
+            print("EditSongsListView: failed to save – \(error)")
+        }
     }
 }

@@ -21,5 +21,6 @@ struct SongsListNavigationLink: View {
                     .font(.subheadline)
             }
         }
+        .accessibilityLabel("\(list.name), \(list.songs.count) song\(list.songs.count == 1 ? "" : "s")")
     }
 }

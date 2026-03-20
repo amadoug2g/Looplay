@@ -24,5 +24,10 @@ struct TimerRingView: View {
             Text(timerManager.timeString)
                 .font(.system(size: 40, weight: .bold))
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(timerManager.isRunning
+            ? "Timer: \(timerManager.remainingTimeString) remaining"
+            : (timerManager.isPaused ? "Timer paused: \(timerManager.remainingTimeString) remaining" : "Timer ready")
+        )
     }
 }

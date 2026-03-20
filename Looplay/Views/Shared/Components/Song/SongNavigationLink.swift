@@ -23,5 +23,6 @@ struct SongNavigationLink: View {
             }
             .padding(.vertical, 4)
         }
+        .accessibilityLabel("\(title), \(list.count) song\(list.count == 1 ? "" : "s")")
     }
 }

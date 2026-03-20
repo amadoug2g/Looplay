@@ -37,8 +37,13 @@ struct RatingView: View {
                     image(for: number)
                         .foregroundStyle(number > rating ? offColor : onColor)
                 }
+                .accessibilityLabel("\(number) star\(number == 1 ? "" : "s")")
+                .accessibilityAddTraits(number <= rating ? .isSelected : [])
             }
-        }.buttonStyle(.plain)
+        }
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Mastery rating: \(rating) out of \(maxRating) stars")
         
         if showHint && rating == 1 {
             Text("Tap the first star again to reset to 0")

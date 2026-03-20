@@ -12,9 +12,10 @@ import Combine
 final class TimerManager: ObservableObject {
     @Published private(set) var elapsedTime: TimeInterval = 0
     @Published private(set) var isRunning: Bool = false
-    
+    @Published private(set) var isPaused: Bool = false
+
     var remainingTime: TimeInterval { totalDuration - elapsedTime }
-    
+
     var isInFinalSeconds: Bool {
         remainingTime <= 5
     }
@@ -55,24 +56,41 @@ final class TimerManager: ObservableObject {
             }
     }
 
-    /// Pause the timer
+    /// Pause the timer (preserves elapsed time)
     func pause() {
         guard isRunning else { return }
         isRunning = false
+        isPaused = true
         timerCancellable?.cancel()
+    }
+
+    /// Resume from a paused state
+    func resume() {
+        guard isPaused else { return }
+        isPaused = false
+        start()
     }
 
     /// Stop and reset the timer
     func stop() {
         isRunning = false
+        isPaused = false
         timerCancellable?.cancel()
         elapsedTime = 0
     }
 
-    /// Reset to a new total duration and clear state
+    /// Reset to a new total duration and clear all state
     func reset(to newDuration: TimeInterval) {
         stop()
         totalDuration = newDuration
+    }
+
+    /// Formatted remaining time string MM:SS
+    var remainingTimeString: String {
+        let secs = Int(remainingTime)
+        let minutes = secs / 60
+        let seconds = secs % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 
     /// Normalized progress [0.0…1.0]
